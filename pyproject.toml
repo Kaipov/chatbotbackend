@@ -1,9 +1,9 @@
 [project]
 name = "chatbot"
 version = "0.1.0"
-description = "Add your description here"
+description = "Educational backend for an LLM chatbot built with FastAPI, OpenAI-compatible APIs, and Qdrant."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "fastapi[standard]>=0.123.7",
     "openai>=2.8.1",
@@ -22,7 +22,7 @@ type = [
 
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py311"
 
 
 [tool.ruff.lint]
