@@ -28,7 +28,7 @@ async def chat(
     orchestrator = Orchestrator(CHAT_BOT)
     context = Context(
         query=request.query,
-        history=request.history or [],
+        history=[message.to_openai_message() for message in request.history],
         settings=settings,
     )
     return await orchestrator.execute(context)
