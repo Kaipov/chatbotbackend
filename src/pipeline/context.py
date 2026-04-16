@@ -3,7 +3,7 @@ from openai.types.chat import ChatCompletionMessageParam
 from pydantic import BaseModel, Field
 from qdrant_client import AsyncQdrantClient
 
-from src.clients.llm import get_llm_client
+from src.clients.llm import get_embedder_client, get_llm_client
 from src.clients.qdrant import get_qdrant_client
 from src.pipeline.abc_base_node import BaseDescisionEnum
 from src.settings import Settings
@@ -23,7 +23,7 @@ class Context(BaseModel):
 
     @property
     def encoder_client(self) -> AsyncOpenAI:
-        return get_llm_client(self.settings)
+        return get_embedder_client(self.settings)
 
     @property
     def qdrant_client(self) -> AsyncQdrantClient:
