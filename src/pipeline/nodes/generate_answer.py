@@ -7,15 +7,19 @@ class LLMAnswer(BaseNode):
     name = "llm_answer"
 
     async def _execute(self, context: Context) -> Context:
-        prompt = "Answer on user query based on documents"
+        prompt = (
+            "Answer the user query based on the provided documents. "
+            "If the documents do not contain enough information, say so."
+        )
 
-        formatted_documents = []
-        for i, document in enumerate(context.documents):
-            formatted_documents.append("Документ 1 " + document)
+        formatted_documents = [
+            f"Document {i}: {document}"
+            for i, document in enumerate(context.documents or [], start=1)
+        ]
 
         response = await get_chat_completion(
             user_query=context.query
-            + "\n\nДокументы:\n"
+            + "\n\nDocuments:\n"
             + "\n\n".join(formatted_documents),
             system_message=prompt,
             history=context.history,
