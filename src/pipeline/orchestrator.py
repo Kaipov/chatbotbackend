@@ -15,8 +15,14 @@ class Orchestrator:
             context = await node.node.execute(context)
 
             if context.decision is not None:
+                if not isinstance(node.next_node, dict):
+                    raise RuntimeError(
+                        f"Node {node.name} returned a decision, but has no decision mapping"
+                    )
                 next_node_name = node.next_node[context.decision]
             else:
+                if not isinstance(node.next_node, str):
+                    raise RuntimeError(f"Node {node.name} has no next node")
                 next_node_name = node.next_node
 
             node = self.graph.name_to_node[next_node_name]
@@ -24,4 +30,9 @@ class Orchestrator:
 
             if node.name == self.graph.end_node.name:
                 break
+        else:
+            raise RuntimeError("Graph execution exceeded maximum number of steps")
+
+        if context.output is None:
+            raise RuntimeError("Graph execution finished without output")
         return context.output

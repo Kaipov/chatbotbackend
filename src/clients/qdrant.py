@@ -38,4 +38,11 @@ async def get_documents(
         query=embedding[0],
         limit=top_k,
     )
-    return [rec.payload["text"] for rec in query_response.points]
+
+    documents: list[str] = []
+    for rec in query_response.points:
+        payload = rec.payload or {}
+        text = payload.get("text")
+        if isinstance(text, str):
+            documents.append(text)
+    return documents
