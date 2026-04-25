@@ -11,6 +11,8 @@ from qdrant_client.models import PointStruct
 from src.clients.llm import get_embedding
 from src.settings import Settings
 
+EMBEDDING_BATCH_SIZE = 64
+
 
 def parse_message(msg: dict[str, Any]) -> dict[str, Any]:
     text_parts: list[str] = []
@@ -54,15 +56,24 @@ async def main(export_path: Path) -> None:
     all_messages = []
     for message in messages:
         cur_message = parse_message(message)
-        if len("text") == 0:
+        if not cur_message["text"].strip():
             continue
         all_messages.append(cur_message)
-    texts = [item["text"] for item in all_messages][:-1_000]
 
-    embeddings = await get_embedding(
-        text=texts,
-        settings=settings,
-    )
+    texts = [item["text"] for item in all_messages]
+    if not texts:
+        raise ValueError("No text messages found in the export.")
+
+    embeddings = []
+    for start in range(0, len(texts), EMBEDDING_BATCH_SIZE):
+        batch = texts[start : start + EMBEDDING_BATCH_SIZE]
+        embeddings.extend(
+            await get_embedding(
+                text=batch,
+                settings=settings,
+            )
+        )
+        print(f"Embedded {min(start + EMBEDDING_BATCH_SIZE, len(texts))}/{len(texts)}")
 
     client = QdrantClient(
         location=str(settings.qdrant_host),
@@ -70,7 +81,9 @@ async def main(export_path: Path) -> None:
 
     points = [
         PointStruct(id=idx, vector=vector, payload=payload)
-        for idx, (vector, payload) in enumerate(zip(embeddings, all_messages))
+        for idx, (vector, payload) in enumerate(
+            zip(embeddings, all_messages, strict=True)
+        )
     ]
 
     if not client.collection_exists(settings.qdrant_collection):
