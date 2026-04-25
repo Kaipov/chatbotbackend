@@ -42,13 +42,24 @@ ISSUES.md                 Current backlog and known problems
 - Python 3.11 or newer
 - `uv`
 - Docker Desktop or a local Qdrant instance
-- Access to an OpenAI-compatible chat model and embedding model
+- OpenRouter API key with access to a chat model and an embedding model
+
+## Model Configuration
+
+The project is configured to use OpenRouter through the OpenAI-compatible API.
+
+Recommended defaults:
+
+- Chat model: `openai/gpt-4o-mini`
+- Embedding model: `openai/text-embedding-3-small`
+
+`openai/gpt-4o-mini` is a good default for this educational project because it is inexpensive and reliable for simple classification. OpenRouter documents structured output support for compatible OpenAI models, but this project keeps the `DialogDescision` node response as plain text: exactly `CHIT_CHAT` or `RAG`.
 
 ## Quick Start
 
 1. Clone the repository.
 2. Copy `.env.example` to `.env`.
-3. Fill in your API keys, model names, and Qdrant settings.
+3. Fill in your OpenRouter API key and Qdrant settings.
 4. Create the local environment and install dependencies:
 
 ```powershell

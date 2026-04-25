@@ -15,7 +15,8 @@ class DialogDescision(BaseDescisionNode[DiloagTypeDescision]):
     async def _execute(self, context: Context) -> Context:
         prompt = (
             "Based on the dialog decide if user want to chat or want to find information about AI talent hub or AI news. "
-            "If user want to chat respond with CHIT_CHAT else respond with RAG."
+            "If user want to chat respond with CHIT_CHAT else respond with RAG. "
+            "Return exactly one of these values without explanations: CHIT_CHAT or RAG."
         )
         response = await get_chat_completion(
             user_query=context.query,
@@ -23,6 +24,8 @@ class DialogDescision(BaseDescisionNode[DiloagTypeDescision]):
             history=context.history,
             settings=context.settings,
             params={
+                "temperature": 0,
+                "max_tokens": 5,
                 "extra_body": {
                     "structured_outputs": {
                         "choice": [
